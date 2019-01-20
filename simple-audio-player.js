@@ -2,6 +2,7 @@
  *  simple-audio-player
  *
  *  @author TGrif 2019 - License MIT
+ *  https://github.com/TGrif/simple-audio-player
  */
 
 
@@ -9,22 +10,19 @@ class SimpleAudioPlayer {
   
   constructor (audioCtx, destination, params) {
     
-    this.audioCtx = audioCtx;
+    this.audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
     
-    // this.params = params || { pan: false, loop: false };  // TODO
-    
-    this.source = audioCtx.createBufferSource();
-    this.destination = destination || audioCtx.destination;
+    this.params = params || { pan: false, loop: false };  // TODO
+    this.source = this.audioCtx.createBufferSource();
+    this.destination = destination || this.audioCtx.destination;
     
     this.channels = 2;
-    this.sampleRate = audioCtx.sampleRate;
+    this.sampleRate = this.audioCtx.sampleRate;
     this.playbackRate = this.source.playbackRate.value;
     
-    // var frameCount = sampleRate * 2.0;
-    // var audioBuffer = audioCtx.createBuffer(channels, frameCount, sampleRate);
     this.audioBuffer = undefined;
     
-    this.gain = audioCtx.createGain();
+    this.gain = this.audioCtx.createGain();
     this.gain.gain.value = 1;
     this.volume = 100;
     
@@ -153,17 +151,15 @@ class SimpleAudioPlayer {
     let minutes = Math.floor((sec_num - (hours * 3600)) / 60);
     let seconds = sec_num - (hours * 3600) - (minutes * 60);
 
-    // if (hours < 10) hours = hours;
-    if (minutes < 10) minutes = /*"0" + */ minutes;
+    if (minutes < 10) minutes = minutes;
     if (seconds < 10) seconds = "0" + seconds;
     
-    return /*hours + ':' + */ minutes + ':' + seconds;
+    return minutes + ':' + seconds;
     
   }
   
   timerScreen() {
-    // console.log('pausedAt', this.pausedAt)
-    // console.log(this.playbackRate)
+
     let timeElapsed = this.audioCtx.currentTime - this.startedAt;
     let time = timeElapsed - this.pausedAt;
     this.sapTimeNow.innerHTML = this.formatTime(timeElapsed);
@@ -172,12 +168,9 @@ class SimpleAudioPlayer {
     this.sapTrack.value = this.trackDuration ? proportion : 0;
   
     if (this.formatTime(time) === this.formatTime(this.trackDuration)) {
-      console.log('clear timer')
-      window.cancelAnimationFrame(this.timer.bind(this))  // TODO this.timer
-      // clearInterval(timer);
-      // $('#time_now').text('0:00');
+      window.cancelAnimationFrame(this.timer)
     }
-  // if (!paused)
+    
     this.timer = window.requestAnimationFrame(this.timerScreen.bind(this))
   }
   
@@ -191,15 +184,12 @@ class SimpleAudioPlayer {
         this.audioCtx.decodeAudioData(buffer, data => {
           this.audioBuffer = data;
           this.trackDuration = data.duration;
-
-          this.play()
-        // setTimeout(function() {
+          this.play();
           this.sapTimeTotal.innerHTML = ' / ' + this.formatTime(this.trackDuration);
-        // }, 120);
       }, err => console.error)
     }, err => console.error);
     
-    console.info('simple-audio-player - Playing: ', file.name);
+    console.info('simple-audio-player - Playing:', file.name);
   }
   
   playlist() {
@@ -230,7 +220,6 @@ class SimpleAudioPlayer {
       this.pausedAt = 0;    // https://stackoverflow.com/a/31653217/5156280
       
       this.timerScreen()
-      // window.requestAnimationFrame(timerScreen)
       
     } else {
       
@@ -238,11 +227,6 @@ class SimpleAudioPlayer {
       
       this.pausedAt = this.audioCtx.currentTime - this.startedAt;
       
-      // this.pausedAt = this.audioCtx.currentTime;
-      
-      // TODO clearInterval
-      // console.log(timer)
-      // clearInterval(timer);
       window.cancelAnimationFrame(this.timer)
       
     }
@@ -277,22 +261,17 @@ class SimpleAudioPlayer {
     this.switchMuteBtn();
   }
   
-  trackChange() {
+  trackChange() {  // FIXME
     this.source.stop();
     window.cancelAnimationFrame(this.timer);
     this.paused = true;
-    // this.pausedAt = (this.trackDuration * 100) / this.sapTrack.value;
+    this.pausedAt = (this.trackDuration / 100) * this.sapTrack.value;
     // this.play()
-    console.log('track change', this.sapTrack.value)  // TODO
-    console.log((this.trackDuration * 100) / this.sapTrack.value)
-    // var time = this.audioCtx.currentTime - this.startedAt;
-    // console.log((this.trackDuration * 100) / (this.time - this.value))
-    // startedAt = (trackDuration * 100) / (time - this.value)
   }
   
   plug(source, destination) {
     source.connect(this.gain);
-    // this.gain.connect(destination);  // TODO
+    this.gain.connect(destination);  // TODO
   }
   
   output() {

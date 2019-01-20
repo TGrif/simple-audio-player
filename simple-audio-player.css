@@ -1,16 +1,17 @@
 
 .simple-audio-player {
-  width: 345px;
+  width: 360px;
   height: 42px;
   color: white;
   background-color: #293133;
   position: absolute;
+  margin-top: 42px;
 }
 
   /* https://stackoverflow.com/a/38163892/5156280 */
   /* https://css-tricks.com/styling-cross-browser-compatible-range-inputs-css/ */
   
-@media screen and (-webkit-min-device-pixel-ratio:0) {
+/* @media screen and (-webkit-min-device-pixel-ratio:0) { */
   input[type='range'] {
     overflow: hidden;
     width: 80px;
@@ -32,9 +33,9 @@
     height: 10px;
     cursor: ew-resize;
     background: #434343;
-    box-shadow: -80px 0 0 80px #43e5f7;
+    /* box-shadow: -80px 0 0 80px #43e5f7; */
   }
-}
+/* } */
 
 /* TODO associer à la class sap */
 /** FF*/
@@ -96,11 +97,9 @@ input[type=range]::-moz-range-thumb:hover {
 
 .simple-audio-player .controls {
   margin-top: 10px;
-  /* margin-top: 51px; */
   display: inline-block;
-  /* background-color: #293133;
-  height: 42px; */
 }
+
 .simple-audio-player .controls #play {
   vertical-align: middle;
   width: 20px;
@@ -110,12 +109,13 @@ input[type=range]::-moz-range-thumb:hover {
   background-color: transparent;
   font-size: 16px;
 }
+
 .simple-audio-player .controls #play:hover {
   color: deepskyblue;
 }
+
 .simple-audio-player .controls #track {
   width: 80px;
-  /* width: 50px; */
   margin-left: 20px;
   vertical-align: middle;
 }
@@ -126,12 +126,14 @@ input[type=range]::-moz-range-thumb:hover {
   font-size: 13px;
   cursor: default;
 }
+
 .simple-audio-player .controls #time_total {
   vertical-align: middle;
   font-size: 13px;
   cursor: default;
   color: lightgrey;
 }
+
 .simple-audio-player .controls #mute {
   width: 20px;
   background-color: transparent;
@@ -140,14 +142,14 @@ input[type=range]::-moz-range-thumb:hover {
   margin-left: 16px;
   vertical-align: middle;
   font-size: 18px;
-  /* cursor: pointer; */
 }
+
 .simple-audio-player .controls #mute:hover {
   color: deepskyblue;
 }
+
 .simple-audio-player .controls #volume {
   width: 50px;
-  /* width: 50px; */
   margin-left: 18px;
   vertical-align: middle;
 }
@@ -155,13 +157,9 @@ input[type=range]::-moz-range-thumb:hover {
 #sap-screen {
   width: 345px;
   height: 41px;
-  margin-top: -41px;
-  /* background-color: #293133; */
-  background-color: white;
-  /* color: white; */
+  margin-top: -42px; /* TODO */
   color: black;
   border-bottom: 1px solid white;
-  /* display: none; */
 }
 
 #sap-file {
