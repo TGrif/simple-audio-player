@@ -13,6 +13,7 @@ class SimpleAudioPlayer {
     this.audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
     
     this.params = params || { pan: false, loop: false };  // TODO
+    
     this.source = this.audioCtx.createBufferSource();
     this.destination = destination || this.audioCtx.destination;
     
@@ -26,6 +27,8 @@ class SimpleAudioPlayer {
     this.gain.gain.value = 1;
     this.volume = 100;
     
+    this.panner = audioCtx.createStereoPanner();
+    
     this.timer = undefined;
     this.trackDuration = 0;
     this.startedAt = 0;
@@ -35,6 +38,8 @@ class SimpleAudioPlayer {
     this.mutedVolume = this.volume;
     
     this.paused = true;
+    
+    this.loop = false;
     
     
     this.buildInterface();
@@ -115,6 +120,32 @@ class SimpleAudioPlayer {
     sapControls.appendChild(sapVolume);
     this.sapVolume = sapVolume;
     
+    if (this.params && this.params.loop) {
+      if (this.params.pan) simpleAudioPlayer.style.width = '460px';
+      else simpleAudioPlayer.style.width = '410px';
+      let sapLoop = document.createElement('button');
+      sapLoop.id = 'loop';
+      sapLoop.setAttribute('class', 'button fa fa-repeat');
+      sapLoop.addEventListener("click", this.loopChange.bind(this));
+      sapControls.appendChild(sapLoop);
+      this.sapLoop = sapLoop;
+    }
+    
+    if (this.params && this.params.pan) {
+      simpleAudioPlayer.style.width = '440px';
+      let sapPan = document.createElement('input');
+      sapPan.id = 'pan';
+      sapPan.setAttribute('type', 'range');
+      sapPan.setAttribute('min', -1);
+      sapPan.setAttribute('max', 1);
+      sapPan.setAttribute('step', 0.1);
+      sapPan.setAttribute('value', 0);
+      sapPan.addEventListener('input', this.panChange.bind(this));
+      sapPan.addEventListener('dblclick', this.panReinit.bind(this));
+      sapControls.appendChild(sapPan);
+      this.sapPan = sapPan;
+    }
+    
   }
   
   switchPlayBtn() {
@@ -167,11 +198,12 @@ class SimpleAudioPlayer {
     let proportion = Math.round((time * 100) / this.trackDuration);
     this.sapTrack.value = this.trackDuration ? proportion : 0;
   
-    if (this.formatTime(time) === this.formatTime(this.trackDuration)) {
-      window.cancelAnimationFrame(this.timer)
+    if (this.formatTime(time) !== this.formatTime(this.trackDuration)) {
+      this.timer = window.requestAnimationFrame(this.timerScreen.bind(this));
+    } else {
+      if (this.loop) this.playlist();
     }
     
-    this.timer = window.requestAnimationFrame(this.timerScreen.bind(this))
   }
   
   loadFile(file) {
@@ -257,7 +289,8 @@ class SimpleAudioPlayer {
   
   volumeChange() {
     this.volume = this.sapVolume.value;
-    this.gain.gain.value = this.volume / 100;
+    let volumeValue = this.volume / 100;
+    this.gain.gain.setValueAtTime(volumeValue, this.audioCtx.currentTime);
     this.switchMuteBtn();
   }
   
@@ -269,9 +302,24 @@ class SimpleAudioPlayer {
     // this.play()
   }
   
+  panChange() {
+    this.panner.pan.setValueAtTime(this.sapPan.value, this.audioCtx.currentTime);
+  }
+  
+  panReinit() {
+    this.sapPan.value = 0;
+  }
+  
+  loopChange() {
+    this.loop = !this.loop;
+    let classActive = this.loop ? 'deepskyblue' : 'white';
+    this.sapLoop.style.color = classActive;
+  }
+  
   plug(source, destination) {
     source.connect(this.gain);
-    this.gain.connect(destination);  // TODO
+    this.gain.connect(this.panner);
+    this.panner.connect(destination);  // TODO
   }
   
   output() {
@@ -279,5 +327,4 @@ class SimpleAudioPlayer {
   }
   
 }
-
 

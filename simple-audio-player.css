@@ -110,10 +110,6 @@ input[type=range]::-moz-range-thumb:hover {
   font-size: 16px;
 }
 
-.simple-audio-player .controls #play:hover {
-  color: deepskyblue;
-}
-
 .simple-audio-player .controls #track {
   width: 80px;
   margin-left: 20px;
@@ -144,14 +140,31 @@ input[type=range]::-moz-range-thumb:hover {
   font-size: 18px;
 }
 
-.simple-audio-player .controls #mute:hover {
-  color: deepskyblue;
-}
-
 .simple-audio-player .controls #volume {
   width: 50px;
   margin-left: 18px;
   vertical-align: middle;
+}
+
+.simple-audio-player .controls #pan {
+  width: 40px;
+  margin-left: 18px;
+  vertical-align: middle;
+}
+
+.simple-audio-player .controls #loop {
+  width: 20px;
+  background-color: transparent;
+  color: white;
+  border: 0px;
+  vertical-align: middle;
+  font-size: 18px;
+}
+
+.simple-audio-player .controls #play:hover,
+.simple-audio-player .controls #mute:hover,
+.simple-audio-player .controls #loop:hover {
+  color: deepskyblue;
 }
 
 #sap-screen {
